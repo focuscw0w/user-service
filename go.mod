@@ -1,3 +1,3 @@
-module github.com/focuscw0w/book-rest-api
+module github.com/focuscw0w/microservices
 
 go 1.24.4
