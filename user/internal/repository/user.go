@@ -1,7 +1,16 @@
 package repository
 
-import "database/sql"
+type User struct {
+	ID	     int
+	Name     string
+	Email    string
+	Password string
+}
 
-type UserRepository struct {
-	db *sql.DB
+type Repository interface {
+	CreateUser() error
+	GetUserByID(id int) (*User, error)
+	UpdateUser(user *User) error
+	DeleteUser(id int) error
+	ListUsers() ([]*User, error)
 }

@@ -1,15 +1,15 @@
 package internal
 
 import (
-	"github.com/focuscw0w/microservices/user/internal/store"
+	"github.com/focuscw0w/microservices/user/internal/repository"
 )
 
 // service dependency
 type UserService struct {
-	userRepo store.Storage
+	userRepo repository.Repository
 }
 
-func NewUserService(repo store.Storage) *UserService {
+func NewUserService(repo repository.Repository) *UserService {
 	return &UserService{userRepo: repo}
 }
 
@@ -19,4 +19,6 @@ type CreateUserRequest struct {
 	Email    string `json:"email"`
 }
 
-//func (s *UserService) Create(req *CreateUserRequest) error {}
+func (s *UserService) Create(req *CreateUserRequest) error {
+	return nil
+}
