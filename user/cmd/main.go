@@ -27,21 +27,28 @@ func main() {
 	// storage
 	storage := store.NewSqlStorage(db)
 
-	// create service
+	// service
 	userService := service.NewUserService(storage)
 
-	// create handler
-	handler := &handler.Handler{UserService: userService}
+	// handler
+	handler := handler.NewHandler(userService)
 	app := application{handler: handler}
 
-	http.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Homepage!")
-	})
-	http.HandleFunc("POST /user", app.handler.Register)
+	// router
+	router := http.NewServeMux()
+
+	router.HandleFunc("GET /", app.handler.HandleHome)
+	router.HandleFunc("POST /register", app.handler.Register)
 
 	// server init
-	log.Println("Server starting on port: 8080")
-	err = http.ListenAndServe(":8080", nil)
+	server := http.Server {
+		Addr: ":8080",
+		Handler: router,
+	}
+
+	log.Println("Server running on port: 8080")
+
+	err = server.ListenAndServe()
 	if err != nil {
 		log.Println("Error while listening to port 8080.")
 	}

@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/focuscw0w/microservices/user/internal/service"
@@ -12,9 +13,13 @@ type Handler struct {
 	UserService *service.UserService
 }
 
+func NewHandler(userService *service.UserService) *Handler {
+	return &Handler{UserService: userService}
+}
+
 func (h *Handler) HandleHome(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Welcome to the homepage!"))
+	log.Println("Homepage!")
 }
 
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
