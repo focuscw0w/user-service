@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/focuscw0w/microservices/user/internal/repository"
+	"github.com/focuscw0w/microservices/repositories"
 )
 
 // service dependency

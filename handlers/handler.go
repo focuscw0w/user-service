@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/focuscw0w/microservices/user/internal/service"
+	"github.com/focuscw0w/microservices/services"
 )
 
 type Handler struct {

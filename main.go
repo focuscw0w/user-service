@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/focuscw0w/microservices/user/internal/handler"
-	"github.com/focuscw0w/microservices/user/internal/service"
-	"github.com/focuscw0w/microservices/user/internal/store"
+	"github.com/focuscw0w/microservices/handler"
+	"github.com/focuscw0w/microservices/services"
+	"github.com/focuscw0w/microservices/repositories"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -25,7 +25,7 @@ func main() {
 	defer db.Close()
 
 	// storage
-	storage := store.NewSqlStorage(db)
+	storage := repository.NewSqlStorage(db)
 
 	// service
 	userService := service.NewUserService(storage)
