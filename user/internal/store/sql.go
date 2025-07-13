@@ -6,4 +6,4 @@ type SqlStorage struct {
 	db *sql.DB
 }
 
-func NewSqlStorage(db *sql.DB) *SqlStorage {}
+//func NewSqlStorage(db *sql.DB) *SqlStorage {}

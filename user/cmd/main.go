@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	"github.com/focuscw0w/microservices/services/user/cmd/api"
-	"github.com/focuscw0w/microservices/services/user/internal/service"
+	"github.com/focuscw0w/microservices/user/cmd/api"
+	"github.com/focuscw0w/microservices/user/internal/service"
 )
 
 type application struct {

@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"net/http"
 
-	"github.com/focuscw0w/microservices/services/user/internal/routes"
+	"github.com/focuscw0w/microservices/user/internal/routes"
 )
 
 type APIServer struct {

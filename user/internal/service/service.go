@@ -1,7 +1,7 @@
 package internal
 
 import (
-	"github.com/focuscw0w/microservices/services/user/internal/store"
+	"github.com/focuscw0w/microservices/user/internal/store"
 )
 
 // service dependency
@@ -19,4 +19,4 @@ type CreateUserRequest struct {
 	Email    string `json:"email"`
 }
 
-func (s *UserService) Create(req *CreateUserRequest) error {}
+//func (s *UserService) Create(req *CreateUserRequest) error {}
