@@ -23,5 +23,4 @@ func main() {
 		log.Fatal("Failed to start server:", err)
 		return
 	}
-	log.Println("Server is running on :8080")
 }

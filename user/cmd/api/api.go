@@ -3,6 +3,7 @@ package api
 import (
 	"database/sql"
 	"net/http"
+	"log"
 
 	"github.com/focuscw0w/microservices/user/internal/routes"
 )
@@ -27,5 +28,6 @@ func (s *APIServer) Run() error {
 
 	mainRouter.Handle("/api/v1/", http.StripPrefix("/api/v1", apiRouter))
 
+	log.Println("Server is running on :8080")
 	return http.ListenAndServe(s.addr, mainRouter)
 }
