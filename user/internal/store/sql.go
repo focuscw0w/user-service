@@ -4,7 +4,6 @@ import (
 	"database/sql"
 
 	"github.com/focuscw0w/microservices/user/internal/repository"
-	
 )
 
 type SqlStorage struct {
@@ -22,7 +21,7 @@ func (s *SqlStorage) CreateUser() error {
 func (s *SqlStorage) GetUserByID(id int) (*repository.User, error) {
 	return nil, nil
 }
-	
+
 func (s *SqlStorage) UpdateUser(user *repository.User) error {
 	return nil
 }

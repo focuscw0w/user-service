@@ -5,18 +5,14 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/focuscw0w/microservices/user/internal/handler"
 	"github.com/focuscw0w/microservices/user/internal/service"
 	"github.com/focuscw0w/microservices/user/internal/store"
 	_ "github.com/mattn/go-sqlite3"
 )
 
 type application struct {
-	userService *internal.UserService
-}
-
-func (app *application) handleCreateUser(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("create user handler"))
+	handler *handler.Handler
 }
 
 func main() {
@@ -30,18 +26,18 @@ func main() {
 
 	// storage
 	storage := store.NewSqlStorage(db)
-	
+
 	// create service
-	userService := internal.NewUserService(storage)
+	userService := service.NewUserService(storage)
 
 	// create handler
-	app := application{userService: userService}
+	handler := &handler.Handler{UserService: userService}
+	app := application{handler: handler}
 
 	http.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Homepage!")
 	})
-	http.HandleFunc("POST /user", app.handleCreateUser)
-
+	http.HandleFunc("POST /user", app.handler.Register)
 
 	// server init
 	log.Println("Server starting on port: 8080")
