@@ -39,7 +39,7 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.UserService.Create(&req)
+	_, err = h.UserService.Create(&req)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("create user failed: %v", err), http.StatusInternalServerError)
 		return
@@ -54,4 +54,8 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(res)
+}
+
+func (h *Handler) GetUsers(w http.ResponseWriter, r *http.Request) {
+	h.UserService.ListUsers()
 }

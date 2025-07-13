@@ -1,13 +1,13 @@
 package main
 
 import (
-	"database/sql"
 	"log"
 	"net/http"
 
 	"github.com/focuscw0w/microservices/handlers"
-	"github.com/focuscw0w/microservices/services"
+	"github.com/focuscw0w/microservices/internal/db"
 	"github.com/focuscw0w/microservices/repositories"
+	"github.com/focuscw0w/microservices/services"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -16,11 +16,9 @@ type application struct {
 }
 
 func main() {
-	// database
-	db, err := sql.Open("sqlite3", "./data.db")
+	db, err := db.InitDB("app.db")
 	if err != nil {
-		log.Fatal("Failed to open database:", err)
-		return
+		log.Fatal(err)
 	}
 	defer db.Close()
 
@@ -39,10 +37,11 @@ func main() {
 
 	router.HandleFunc("GET /", app.handler.HandleHome)
 	router.HandleFunc("POST /register", app.handler.Register)
+	router.HandleFunc("GET /users", app.handler.GetUsers)
 
 	// server init
-	server := http.Server {
-		Addr: ":8080",
+	server := http.Server{
+		Addr:    ":8080",
 		Handler: router,
 	}
 
