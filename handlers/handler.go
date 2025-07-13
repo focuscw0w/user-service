@@ -22,6 +22,10 @@ func (h *Handler) HandleHome(w http.ResponseWriter, r *http.Request) {
 	log.Println("Homepage!")
 }
 
+type Response struct {
+	Message string `json:"message"`
+}
+
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
@@ -41,6 +45,13 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	res, err := json.Marshal(Response{Message: "success"})
+	if err != nil {
+		http.Error(w, "Failed to serialize response", http.StatusInternalServerError)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
-	w.Write([]byte("User registered successfully"))
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(res)
 }

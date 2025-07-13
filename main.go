@@ -5,7 +5,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/focuscw0w/microservices/handler"
+	"github.com/focuscw0w/microservices/handlers"
 	"github.com/focuscw0w/microservices/services"
 	"github.com/focuscw0w/microservices/repositories"
 	_ "github.com/mattn/go-sqlite3"

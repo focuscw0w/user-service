@@ -14,7 +14,6 @@ func NewUserService(repo repository.Repository) *UserService {
 }
 
 type CreateUserRequest struct {
-	ID       int    `json:"id"`
 	Name     string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
