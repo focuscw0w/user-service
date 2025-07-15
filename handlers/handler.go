@@ -42,7 +42,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	_, err = h.UserService.CreateUser(&req)
 
 	if err != nil {
-		http.Error(w, fmt.Sprintf("create user failed: %v", err), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Could not create user: %v", err), http.StatusInternalServerError)
 		return
 	}
 

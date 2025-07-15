@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"github.com/focuscw0w/microservices/internal/security"
 	"log"
 
 	"github.com/focuscw0w/microservices/repositories"
@@ -28,10 +29,15 @@ func (s *UserService) CreateUser(req *CreateUserRequest) (*repository.User, erro
 	}
 
 	// hash password
+	hashedPassword, err := security.HashPassword(req.Password)
+	if err != nil {
+		return nil, err
+	}
+
 	user := &repository.User{
 		Username: req.Username,
 		Email:    req.Email,
-		Password: req.Password,
+		Password: hashedPassword,
 	}
 
 	// transform to dto
@@ -46,7 +52,7 @@ func (s *UserService) ListUsers() error {
 	}
 
 	for _, u := range users {
-		log.Println(u.Username)
+		log.Println(u.Password)
 	}
 
 	// transform to dto
