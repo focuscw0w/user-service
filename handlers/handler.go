@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -39,22 +40,27 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.UserService.CreateUser(&req)
-
+	userDTO, err := h.UserService.CreateUser(&req)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Could not create user: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	res, err := json.Marshal(Response{Message: "success"})
+	buffer := new(bytes.Buffer)
+	err = json.NewEncoder(buffer).Encode(userDTO)
 	if err != nil {
-		http.Error(w, "Failed to serialize response", http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(res)
+	w.WriteHeader(http.StatusCreated)
+
+	_, err = w.Write(buffer.Bytes())
+	if err != nil {
+		log.Printf("Error writing response: %v", err)
+		return
+	}
 }
 
 func (h *Handler) GetUsers(w http.ResponseWriter, r *http.Request) {
