@@ -2,9 +2,9 @@ package service
 
 import (
 	"errors"
-	"github.com/focuscw0w/microservices/internal/security"
 	"log"
 
+	"github.com/focuscw0w/microservices/internal/security"
 	"github.com/focuscw0w/microservices/repositories"
 )
 
@@ -23,12 +23,17 @@ type CreateUserRequest struct {
 	Password string `json:"password"`
 }
 
-func (s *UserService) CreateUser(req *CreateUserRequest) (*repository.User, error) {
+type UserDTO struct {
+	ID       int    `json:"id"`
+	Username string `json:"username"`
+	Email    string `json:"email"`
+}
+
+func (s *UserService) CreateUser(req *CreateUserRequest) (*UserDTO, error) {
 	if req.Username == "" || req.Email == "" || req.Password == "" {
 		return nil, errors.New("username, email and password must not be empty")
 	}
 
-	// hash password
 	hashedPassword, err := security.HashPassword(req.Password)
 	if err != nil {
 		return nil, err
@@ -40,9 +45,18 @@ func (s *UserService) CreateUser(req *CreateUserRequest) (*repository.User, erro
 		Password: hashedPassword,
 	}
 
-	// transform to dto
+	createdUser, err := s.userRepo.CreateUser(user)
+	if err != nil {
+		return nil, err
+	}
 
-	return s.userRepo.CreateUser(user)
+	userDTO := &UserDTO{
+		ID:       createdUser.ID,
+		Username: createdUser.Username,
+		Email:    createdUser.Email,
+	}
+
+	return userDTO, nil
 }
 
 func (s *UserService) ListUsers() error {
