@@ -10,7 +10,7 @@ type User struct {
 }
 
 type Repository interface {
-	CreateUser(user *User) error
+	CreateUser(user *User) (*User, error)
 	GetUserByID(id int) (*User, error)
 	UpdateUser(user *User) error
 	DeleteUser(id int) error
@@ -25,22 +25,22 @@ func NewSqlStorage(db *sql.DB) *SqlStorage {
 	return &SqlStorage{db: db}
 }
 
-func (s *SqlStorage) CreateUser(user *User) error {
+func (s *SqlStorage) CreateUser(user *User) (*User, error) {
 	query := `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`
 
 	res, err := s.db.Exec(query, user.Username, user.Email, user.Password)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	id, err := res.LastInsertId()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	user.ID = int(id)
 
-	return nil
+	return user, nil
 }
 
 func (s *SqlStorage) GetUserByID(id int) (*User, error) {
@@ -68,7 +68,9 @@ func (s *SqlStorage) ListUsers() ([]*User, error) {
 	var users []*User
 	for rows.Next() {
 		var u User
-		if err := rows.Scan(&u.ID, &u.Username, &u.Email, &u.Password); err != nil {
+
+		err := rows.Scan(&u.ID, &u.Username, &u.Email, &u.Password)
+		if err != nil {
 			return nil, err
 		}
 		users = append(users, &u)

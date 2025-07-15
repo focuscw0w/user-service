@@ -22,24 +22,19 @@ func main() {
 	}
 	defer db.Close()
 
-	// storage
 	storage := repository.NewSqlStorage(db)
 
-	// service
 	userService := service.NewUserService(storage)
 
-	// handler
 	handler := handler.NewHandler(userService)
 	app := application{handler: handler}
 
-	// router
 	router := http.NewServeMux()
 
 	router.HandleFunc("GET /", app.handler.HandleHome)
-	router.HandleFunc("POST /register", app.handler.Register)
+	router.HandleFunc("POST /sign-up", app.handler.SignUp)
 	router.HandleFunc("GET /users", app.handler.GetUsers)
 
-	// server init
 	server := http.Server{
 		Addr:    ":8080",
 		Handler: router,

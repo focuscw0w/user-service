@@ -22,18 +22,21 @@ type CreateUserRequest struct {
 	Password string `json:"password"`
 }
 
-func (s *UserService) Create(req *CreateUserRequest) (*repository.User ,error) {
+func (s *UserService) CreateUser(req *CreateUserRequest) (*repository.User, error) {
 	if req.Username == "" || req.Email == "" || req.Password == "" {
 		return nil, errors.New("username, email and password must not be empty")
 	}
 
+	// hash password
 	user := &repository.User{
 		Username: req.Username,
 		Email:    req.Email,
 		Password: req.Password,
 	}
 
-	return user, s.userRepo.CreateUser(user)
+	// transform to dto
+
+	return s.userRepo.CreateUser(user)
 }
 
 func (s *UserService) ListUsers() error {
@@ -45,6 +48,8 @@ func (s *UserService) ListUsers() error {
 	for _, u := range users {
 		log.Println(u.Username)
 	}
+
+	// transform to dto
 
 	return nil
 }

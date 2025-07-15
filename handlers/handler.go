@@ -26,7 +26,7 @@ type Response struct {
 	Message string `json:"message"`
 }
 
-func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
 		return
@@ -39,7 +39,8 @@ func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.UserService.Create(&req)
+	_, err = h.UserService.CreateUser(&req)
+
 	if err != nil {
 		http.Error(w, fmt.Sprintf("create user failed: %v", err), http.StatusInternalServerError)
 		return
