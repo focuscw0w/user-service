@@ -29,7 +29,7 @@ func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req service.CreateUserRequest
+	var req service.SignUpRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		log.Printf("Failed to decode request body: %v", err)

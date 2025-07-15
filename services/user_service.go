@@ -17,7 +17,7 @@ func NewUserService(repo repository.Repository) *UserService {
 	return &UserService{userRepo: repo}
 }
 
-type SignUpUserRequest struct {
+type SignUpRequest struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -29,7 +29,7 @@ type UserDTO struct {
 	Email    string `json:"email"`
 }
 
-func (s *UserService) SignUp(req *SignUpUserRequest) (*UserDTO, error) {
+func (s *UserService) SignUp(req *SignUpRequest) (*UserDTO, error) {
 	if req.Username == "" || req.Email == "" || req.Password == "" {
 		return nil, errors.New("username, email and password must not be empty")
 	}
