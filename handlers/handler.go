@@ -22,7 +22,7 @@ type Response struct {
 	Message string `json:"message"`
 }
 
-func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		log.Printf("Rejected non-POST method: %s", r.Method)
 		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
@@ -37,7 +37,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userDTO, err := h.UserService.CreateUser(&req)
+	userDTO, err := h.UserService.SignUp(&req)
 	if err != nil {
 		log.Printf("Failed to create user: %v", err)
 		http.Error(w, fmt.Sprintf("Could not create user: %v", err), http.StatusInternalServerError)

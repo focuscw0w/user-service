@@ -31,7 +31,7 @@ func main() {
 
 	router := http.NewServeMux()
 
-	router.HandleFunc("POST /sign-up", app.handler.SignUp)
+	router.HandleFunc("POST /sign-up", app.handler.HandleSignUp)
 	router.HandleFunc("GET /users", app.handler.GetUsers)
 
 	server := http.Server{
