@@ -2,13 +2,6 @@ package repository
 
 import "database/sql"
 
-type User struct {
-	ID       int
-	Username string
-	Email    string
-	Password string
-}
-
 type Repository interface {
 	CreateUser(user *User) (*User, error)
 	GetUserByID(id int) (*User, error)
@@ -23,6 +16,13 @@ type SqlStorage struct {
 
 func NewSqlStorage(db *sql.DB) *SqlStorage {
 	return &SqlStorage{db: db}
+}
+
+type User struct {
+	ID       int
+	Username string
+	Email    string
+	Password string
 }
 
 func (s *SqlStorage) CreateUser(user *User) (*User, error) {

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/focuscw0w/microservices/internal/security"
 	"log"
 	"net/http"
 
@@ -43,6 +44,23 @@ func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, fmt.Sprintf("Could not create user: %v", err), http.StatusInternalServerError)
 		return
 	}
+
+	token, err := security.CreateToken(userDTO.Username)
+	if err != nil {
+		log.Printf("Failed to create session token: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	cookie := http.Cookie{
+		Name:     "auth_token",
+		Value:    token,
+		HttpOnly: true,
+		Path:     "/",
+		SameSite: http.SameSiteLaxMode,
+	}
+
+	http.SetCookie(w, &cookie)
 
 	buffer := new(bytes.Buffer)
 	err = json.NewEncoder(buffer).Encode(userDTO)
