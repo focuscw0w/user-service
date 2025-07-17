@@ -3,11 +3,11 @@ package repository
 import "database/sql"
 
 type Repository interface {
-	CreateUser(user *User) (*User, error)
 	GetUserByID(id int) (*User, error)
+	CreateUser(user *User) (*User, error)
 	UpdateUser(user *User) error
 	DeleteUser(id int) error
-	ListUsers() ([]*User, error)
+	GetAllUsers() ([]*User, error)
 }
 
 type SqlStorage struct {
@@ -55,7 +55,7 @@ func (s *SqlStorage) DeleteUser(id int) error {
 	return nil
 }
 
-func (s *SqlStorage) ListUsers() ([]*User, error) {
+func (s *SqlStorage) GetAllUsers() ([]*User, error) {
 	query := `SELECT * FROM users`
 
 	rows, err := s.db.Query(query)

@@ -80,6 +80,34 @@ func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *Handler) GetUsers(w http.ResponseWriter, r *http.Request) {
-	h.UserService.ListUsers()
+func (h *Handler) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		log.Printf("Rejected non-GET method: %s", r.Method)
+		http.Error(w, "Only GET method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	usersDTO, err := h.UserService.ListUsers()
+	if err != nil {
+		log.Printf("Failed to list users: %v", err)
+		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		return
+	}
+
+	buffer := new(bytes.Buffer)
+	err = json.NewEncoder(buffer).Encode(usersDTO)
+	if err != nil {
+		log.Printf("Failed to encode response: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	_, err = w.Write(buffer.Bytes())
+	if err != nil {
+		log.Printf("Error writing response: %v", err)
+		return
+	}
 }

@@ -2,8 +2,6 @@ package service
 
 import (
 	"errors"
-	"log"
-
 	"github.com/focuscw0w/microservices/internal/security"
 	"github.com/focuscw0w/microservices/repositories"
 )
@@ -59,17 +57,20 @@ func (s *UserService) SignUp(req *SignUpRequest) (*UserDTO, error) {
 	return userDTO, nil
 }
 
-func (s *UserService) ListUsers() error {
-	users, err := s.userRepo.ListUsers()
+func (s *UserService) ListUsers() ([]*UserDTO, error) {
+	users, err := s.userRepo.GetAllUsers()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	for _, u := range users {
-		log.Println(u.Password)
+	usersDTO := make([]*UserDTO, len(users))
+	for i, u := range users {
+		usersDTO[i] = &UserDTO{
+			ID:       u.ID,
+			Username: u.Username,
+			Email:    u.Email,
+		}
 	}
 
-	// transform to dto
-
-	return nil
+	return usersDTO, nil
 }
