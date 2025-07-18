@@ -231,3 +231,33 @@ func (h *Handler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (h *Handler) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodDelete {
+		log.Printf("Rejected non-DELETE method: %s", r.Method)
+		http.Error(w, "Only DELETE method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	idStr := strings.TrimPrefix(r.URL.Path, "/users/")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	err = h.UserService.DeleteUser(id)
+	if err != nil {
+		log.Printf("Failed to delete user: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write([]byte(`{"message":"User deleted"}`))
+	if err != nil {
+		log.Printf("Error writing response: %v", err)
+		return
+	}
+}

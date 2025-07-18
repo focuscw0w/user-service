@@ -99,5 +99,12 @@ func (s *SqlStorage) UpdateUser(user *User) error {
 }
 
 func (s *SqlStorage) DeleteUser(id int) error {
+	query := `DELETE FROM users WHERE id = ?`
+
+	_, err := s.db.Exec(query, id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

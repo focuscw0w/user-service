@@ -1,7 +1,7 @@
 package service
 
 import (
-	"errors"
+	"github.com/focuscw0w/microservices/internal/errors"
 	"github.com/focuscw0w/microservices/internal/security"
 	"github.com/focuscw0w/microservices/repositories"
 )
@@ -34,7 +34,7 @@ type UserDTO struct {
 
 func (s *UserService) SignUp(req *SignUpRequest) (*UserDTO, error) {
 	if req.Username == "" || req.Email == "" || req.Password == "" {
-		return nil, errors.New("username, email and password must not be empty")
+		return nil, errors.ErrEmptyCredentials
 	}
 
 	hashedPassword, err := security.HashPassword(req.Password)
@@ -64,17 +64,17 @@ func (s *UserService) SignUp(req *SignUpRequest) (*UserDTO, error) {
 
 func (s *UserService) SignIn(req *SignInRequest) (*UserDTO, error) {
 	if req.Username == "" || req.Password == "" {
-		return nil, errors.New("username and password must not be empty")
+		return nil, errors.ErrEmptyCredentials
 	}
 
 	user, err := s.userRepo.GetUserByUsername(req.Username)
 	if err != nil {
-		return nil, errors.New("user not found")
+		return nil, errors.ErrUserNotFound
 	}
 
 	err = security.VerifyPassword(user.Password, req.Password)
 	if err != nil {
-		return nil, errors.New("invalid password")
+		return nil, errors.ErrInvalidPassword
 	}
 
 	userDTO := &UserDTO{
@@ -107,7 +107,7 @@ func (s *UserService) ListUsers() ([]*UserDTO, error) {
 func (s *UserService) GetUser(id int) (*UserDTO, error) {
 	user, err := s.userRepo.GetUserByID(id)
 	if err != nil {
-		return nil, errors.New("user not found")
+		return nil, errors.ErrUserNotFound
 	}
 
 	userDTO := &UserDTO{
@@ -117,4 +117,13 @@ func (s *UserService) GetUser(id int) (*UserDTO, error) {
 	}
 
 	return userDTO, nil
+}
+
+func (s *UserService) DeleteUser(id int) error {
+	err := s.userRepo.DeleteUser(id)
+	if err != nil {
+		return errors.ErrUserNotFound
+	}
+
+	return nil
 }

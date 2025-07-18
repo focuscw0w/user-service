@@ -37,6 +37,7 @@ func main() {
 	router.HandleFunc("POST /sign-out", app.handler.HandleSignOut)
 	router.HandleFunc("GET /users", app.handler.HandleGetUsers)
 	router.HandleFunc("GET /users/", app.handler.HandleGetUser)
+	router.HandleFunc("DELETE /users/", app.handler.HandleDeleteUser)
 
 	server := http.Server{
 		Addr:    ":8080",
