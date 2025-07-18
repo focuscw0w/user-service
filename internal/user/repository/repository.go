@@ -2,7 +2,7 @@ package repository
 
 import "database/sql"
 
-type Repository interface {
+type UserRepository interface {
 	GetUserByID(id int) (*User, error)
 	GetUserByUsername(username string) (*User, error)
 	GetAllUsers() ([]*User, error)
@@ -11,12 +11,12 @@ type Repository interface {
 	DeleteUser(id int) error
 }
 
-type SqlStorage struct {
+type SQLRepository struct {
 	db *sql.DB
 }
 
-func NewSqlStorage(db *sql.DB) *SqlStorage {
-	return &SqlStorage{db: db}
+func NewRepository(db *sql.DB) *SQLRepository {
+	return &SQLRepository{db: db}
 }
 
 type User struct {
@@ -26,7 +26,7 @@ type User struct {
 	Password string
 }
 
-func (s *SqlStorage) GetUserByID(id int) (*User, error) {
+func (s *SQLRepository) GetUserByID(id int) (*User, error) {
 	query := `SELECT * FROM users WHERE id = ?`
 
 	var u User
@@ -39,7 +39,7 @@ func (s *SqlStorage) GetUserByID(id int) (*User, error) {
 	return &u, nil
 }
 
-func (s *SqlStorage) GetUserByUsername(username string) (*User, error) {
+func (s *SQLRepository) GetUserByUsername(username string) (*User, error) {
 	query := `SELECT * FROM users WHERE username = ?`
 
 	var u User
@@ -52,7 +52,7 @@ func (s *SqlStorage) GetUserByUsername(username string) (*User, error) {
 	return &u, nil
 }
 
-func (s *SqlStorage) GetAllUsers() ([]*User, error) {
+func (s *SQLRepository) GetAllUsers() ([]*User, error) {
 	query := `SELECT * FROM users`
 
 	rows, err := s.db.Query(query)
@@ -76,7 +76,7 @@ func (s *SqlStorage) GetAllUsers() ([]*User, error) {
 	return users, nil
 }
 
-func (s *SqlStorage) CreateUser(user *User) (*User, error) {
+func (s *SQLRepository) CreateUser(user *User) (*User, error) {
 	query := `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`
 
 	res, err := s.db.Exec(query, user.Username, user.Email, user.Password)
@@ -94,11 +94,11 @@ func (s *SqlStorage) CreateUser(user *User) (*User, error) {
 	return user, nil
 }
 
-func (s *SqlStorage) UpdateUser(user *User) error {
+func (s *SQLRepository) UpdateUser(user *User) error {
 	return nil
 }
 
-func (s *SqlStorage) DeleteUser(id int) error {
+func (s *SQLRepository) DeleteUser(id int) error {
 	query := `DELETE FROM users WHERE id = ?`
 
 	_, err := s.db.Exec(query, id)

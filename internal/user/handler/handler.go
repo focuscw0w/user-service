@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"github.com/focuscw0w/microservices/internal/security"
 	"log"
 	"net/http"
 	"strconv"
 	"strings"
 
-	"github.com/focuscw0w/microservices/services"
+	"github.com/focuscw0w/microservices/internal/user/security"
+	"github.com/focuscw0w/microservices/internal/user/service"
 )
 
 type Handler struct {
@@ -46,7 +46,7 @@ func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	token, err := security.CreateToken(userDTO.Username)
 	if err != nil {
 		log.Printf("Failed to create session token: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		http.Error(w, "Internal server errors", http.StatusInternalServerError)
 		return
 	}
 
@@ -103,7 +103,7 @@ func (h *Handler) HandleSignIn(w http.ResponseWriter, r *http.Request) {
 	token, err := security.CreateToken(userDTO.Username)
 	if err != nil {
 		log.Printf("Failed to create session token: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		http.Error(w, "Internal server errors", http.StatusInternalServerError)
 		return
 	}
 
@@ -171,7 +171,7 @@ func (h *Handler) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
 	usersDTO, err := h.UserService.ListUsers()
 	if err != nil {
 		log.Printf("Failed to list users: %v", err)
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		http.Error(w, "Internal server errors", http.StatusInternalServerError)
 		return
 	}
 

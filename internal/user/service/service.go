@@ -1,17 +1,17 @@
 package service
 
 import (
-	"github.com/focuscw0w/microservices/internal/errors"
-	"github.com/focuscw0w/microservices/internal/security"
-	"github.com/focuscw0w/microservices/repositories"
+	"github.com/focuscw0w/microservices/internal/user/errors"
+	"github.com/focuscw0w/microservices/internal/user/repository"
+	"github.com/focuscw0w/microservices/internal/user/security"
 )
 
 // UserService service dependency
 type UserService struct {
-	userRepo repository.Repository
+	userRepo repository.UserRepository
 }
 
-func NewUserService(repo repository.Repository) *UserService {
+func NewService(repo repository.UserRepository) *UserService {
 	return &UserService{userRepo: repo}
 }
 
