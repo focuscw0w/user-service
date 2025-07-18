@@ -48,7 +48,7 @@ func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie := http.Cookie{
+	c := http.Cookie{
 		Name:     "auth_token",
 		Value:    token,
 		HttpOnly: true,
@@ -56,7 +56,7 @@ func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	}
 
-	http.SetCookie(w, &cookie)
+	http.SetCookie(w, &c)
 
 	buffer := new(bytes.Buffer)
 	err = json.NewEncoder(buffer).Encode(userDTO)
@@ -105,7 +105,7 @@ func (h *Handler) HandleSignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	cookie := http.Cookie{
+	c := http.Cookie{
 		Name:     "auth_token",
 		Value:    token,
 		HttpOnly: true,
@@ -113,7 +113,7 @@ func (h *Handler) HandleSignIn(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	}
 
-	http.SetCookie(w, &cookie)
+	http.SetCookie(w, &c)
 
 	buffer := new(bytes.Buffer)
 	err = json.NewEncoder(buffer).Encode(userDTO)
@@ -127,6 +127,32 @@ func (h *Handler) HandleSignIn(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	_, err = w.Write(buffer.Bytes())
+	if err != nil {
+		log.Printf("Error writing response: %v", err)
+		return
+	}
+}
+
+func (h *Handler) HandleSignOut(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		log.Printf("Rejected non-POST method: %s", r.Method)
+		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	c := &http.Cookie{
+		Name:     "auth_token",
+		Value:    "",
+		HttpOnly: true,
+		Path:     "/",
+		MaxAge:   -1,
+	}
+
+	http.SetCookie(w, c)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	_, err := w.Write([]byte(`{"message":"Signed out"}`))
 	if err != nil {
 		log.Printf("Error writing response: %v", err)
 		return

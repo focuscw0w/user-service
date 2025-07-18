@@ -34,6 +34,7 @@ func main() {
 
 	router.HandleFunc("POST /sign-up", app.handler.HandleSignUp)
 	router.HandleFunc("POST /sign-in", app.handler.HandleSignIn)
+	router.HandleFunc("POST /sign-out", app.handler.HandleSignOut)
 	router.HandleFunc("GET /users", app.handler.HandleGetUsers)
 
 	server := http.Server{
