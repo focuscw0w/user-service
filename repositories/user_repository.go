@@ -26,34 +26,30 @@ type User struct {
 	Password string
 }
 
-func (s *SqlStorage) CreateUser(user *User) (*User, error) {
-	query := `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`
-
-	res, err := s.db.Exec(query, user.Username, user.Email, user.Password)
-	if err != nil {
-		return nil, err
-	}
-
-	id, err := res.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
-
-	user.ID = int(id)
-
-	return user, nil
-}
-
 func (s *SqlStorage) GetUserByID(id int) (*User, error) {
-	return nil, nil
+	query := `SELECT * FROM users WHERE id = ?`
+
+	var u User
+	row := s.db.QueryRow(query, id)
+	err := row.Scan(&u.ID, &u.Username, &u.Email, &u.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	return &u, nil
 }
 
-func (s *SqlStorage) UpdateUser(user *User) error {
-	return nil
-}
+func (s *SqlStorage) GetUserByUsername(username string) (*User, error) {
+	query := `SELECT * FROM users WHERE username = ?`
 
-func (s *SqlStorage) DeleteUser(id int) error {
-	return nil
+	var u User
+	row := s.db.QueryRow(query, username)
+	err := row.Scan(&u.ID, &u.Username, &u.Email, &u.Password)
+	if err != nil {
+		return nil, err
+	}
+
+	return &u, nil
 }
 
 func (s *SqlStorage) GetAllUsers() ([]*User, error) {
@@ -80,15 +76,28 @@ func (s *SqlStorage) GetAllUsers() ([]*User, error) {
 	return users, nil
 }
 
-func (s *SqlStorage) GetUserByUsername(username string) (*User, error) {
-	query := `SELECT * FROM users WHERE username = ?`
+func (s *SqlStorage) CreateUser(user *User) (*User, error) {
+	query := `INSERT INTO users (username, email, password) VALUES (?, ?, ?)`
 
-	var u User
-	row := s.db.QueryRow(query, username)
-	err := row.Scan(&u.ID, &u.Username, &u.Email, &u.Password)
+	res, err := s.db.Exec(query, user.Username, user.Email, user.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	return &u, nil
+	id, err := res.LastInsertId()
+	if err != nil {
+		return nil, err
+	}
+
+	user.ID = int(id)
+
+	return user, nil
+}
+
+func (s *SqlStorage) UpdateUser(user *User) error {
+	return nil
+}
+
+func (s *SqlStorage) DeleteUser(id int) error {
+	return nil
 }

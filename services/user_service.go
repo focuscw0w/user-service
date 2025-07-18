@@ -103,3 +103,18 @@ func (s *UserService) ListUsers() ([]*UserDTO, error) {
 
 	return usersDTO, nil
 }
+
+func (s *UserService) GetUser(id int) (*UserDTO, error) {
+	user, err := s.userRepo.GetUserByID(id)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	userDTO := &UserDTO{
+		ID:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
+	}
+
+	return userDTO, nil
+}

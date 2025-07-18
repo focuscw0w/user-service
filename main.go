@@ -36,6 +36,7 @@ func main() {
 	router.HandleFunc("POST /sign-in", app.handler.HandleSignIn)
 	router.HandleFunc("POST /sign-out", app.handler.HandleSignOut)
 	router.HandleFunc("GET /users", app.handler.HandleGetUsers)
+	router.HandleFunc("GET /users/", app.handler.HandleGetUser)
 
 	server := http.Server{
 		Addr:    ":8080",

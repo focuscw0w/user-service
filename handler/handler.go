@@ -7,6 +7,8 @@ import (
 	"github.com/focuscw0w/microservices/internal/security"
 	"log"
 	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/focuscw0w/microservices/services"
 )
@@ -152,7 +154,7 @@ func (h *Handler) HandleSignOut(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	_, err := w.Write([]byte(`{"message":"Signed out"}`))
+	_, err := w.Write([]byte(`{"message":"Signed out successfully"}`))
 	if err != nil {
 		log.Printf("Error writing response: %v", err)
 		return
@@ -175,6 +177,45 @@ func (h *Handler) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
 
 	buffer := new(bytes.Buffer)
 	err = json.NewEncoder(buffer).Encode(usersDTO)
+	if err != nil {
+		log.Printf("Failed to encode response: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	_, err = w.Write(buffer.Bytes())
+	if err != nil {
+		log.Printf("Error writing response: %v", err)
+		return
+	}
+}
+
+func (h *Handler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		log.Printf("Rejected non-GET method: %s", r.Method)
+		http.Error(w, "Only GET method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	idStr := strings.TrimPrefix(r.URL.Path, "/users/")
+	id, err := strconv.Atoi(idStr)
+	if err != nil {
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	userDTO, err := h.UserService.GetUser(id)
+	if err != nil {
+		log.Printf("Failed to get user: %v", err)
+		http.Error(w, "User not found", http.StatusNotFound)
+		return
+	}
+
+	buffer := new(bytes.Buffer)
+	err = json.NewEncoder(buffer).Encode(userDTO)
 	if err != nil {
 		log.Printf("Failed to encode response: %v", err)
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
