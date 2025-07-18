@@ -4,10 +4,11 @@ import "database/sql"
 
 type Repository interface {
 	GetUserByID(id int) (*User, error)
+	GetUserByUsername(username string) (*User, error)
+	GetAllUsers() ([]*User, error)
 	CreateUser(user *User) (*User, error)
 	UpdateUser(user *User) error
 	DeleteUser(id int) error
-	GetAllUsers() ([]*User, error)
 }
 
 type SqlStorage struct {
@@ -76,10 +77,18 @@ func (s *SqlStorage) GetAllUsers() ([]*User, error) {
 		users = append(users, &u)
 	}
 
-	err = rows.Err()
+	return users, nil
+}
+
+func (s *SqlStorage) GetUserByUsername(username string) (*User, error) {
+	query := `SELECT * FROM users WHERE username = ?`
+
+	var u User
+	row := s.db.QueryRow(query, username)
+	err := row.Scan(&u.ID, &u.Username, &u.Email, &u.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	return users, nil
+	return &u, nil
 }

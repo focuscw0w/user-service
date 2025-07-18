@@ -6,7 +6,7 @@ import (
 	"github.com/focuscw0w/microservices/repositories"
 )
 
-// service dependency
+// UserService service dependency
 type UserService struct {
 	userRepo repository.Repository
 }
@@ -18,6 +18,11 @@ func NewUserService(repo repository.Repository) *UserService {
 type SignUpRequest struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+type SignInRequest struct {
+	Username string `json:"username"`
 	Password string `json:"password"`
 }
 
@@ -52,6 +57,30 @@ func (s *UserService) SignUp(req *SignUpRequest) (*UserDTO, error) {
 		ID:       createdUser.ID,
 		Username: createdUser.Username,
 		Email:    createdUser.Email,
+	}
+
+	return userDTO, nil
+}
+
+func (s *UserService) SignIn(req *SignInRequest) (*UserDTO, error) {
+	if req.Username == "" || req.Password == "" {
+		return nil, errors.New("username and password must not be empty")
+	}
+
+	user, err := s.userRepo.GetUserByUsername(req.Username)
+	if err != nil {
+		return nil, errors.New("user not found")
+	}
+
+	err = security.VerifyPassword(user.Password, req.Password)
+	if err != nil {
+		return nil, errors.New("invalid password")
+	}
+
+	userDTO := &UserDTO{
+		ID:       user.ID,
+		Username: user.Username,
+		Email:    user.Email,
 	}
 
 	return userDTO, nil

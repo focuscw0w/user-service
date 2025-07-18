@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/focuscw0w/microservices/handlers"
+	"github.com/focuscw0w/microservices/handler"
 	"github.com/focuscw0w/microservices/internal/db"
 	"github.com/focuscw0w/microservices/repositories"
 	"github.com/focuscw0w/microservices/services"
@@ -26,12 +26,14 @@ func main() {
 
 	userService := service.NewUserService(storage)
 
-	handler := handler.NewHandler(userService)
-	app := application{handler: handler}
+	apiHandler := handler.NewHandler(userService)
+
+	app := application{handler: apiHandler}
 
 	router := http.NewServeMux()
 
 	router.HandleFunc("POST /sign-up", app.handler.HandleSignUp)
+	router.HandleFunc("POST /sign-in", app.handler.HandleSignIn)
 	router.HandleFunc("GET /users", app.handler.HandleGetUsers)
 
 	server := http.Server{
