@@ -168,7 +168,7 @@ func (h *Handler) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	usersDTO, err := h.UserService.ListUsers()
+	usersDTO, err := h.UserService.GetUsers()
 	if err != nil {
 		log.Printf("Failed to list users: %v", err)
 		http.Error(w, "Internal server errors", http.StatusInternalServerError)

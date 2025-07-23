@@ -86,7 +86,7 @@ func (s *UserService) SignIn(req *SignInRequest) (*UserDTO, error) {
 	return userDTO, nil
 }
 
-func (s *UserService) ListUsers() ([]*UserDTO, error) {
+func (s *UserService) GetUsers() ([]*UserDTO, error) {
 	users, err := s.userRepo.GetAllUsers()
 	if err != nil {
 		return nil, err

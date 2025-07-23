@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/focuscw0w/microservices/api"
 	"log"
 	"net/http"
 
@@ -41,7 +42,7 @@ func main() {
 
 	server := http.Server{
 		Addr:    ":8080",
-		Handler: router,
+		Handler: api.Logging(router),
 	}
 
 	log.Println("Server running on port: 8080")
