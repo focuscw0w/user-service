@@ -4,21 +4,21 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	email "github.com/focuscw0w/microservices/internal/email/service"
+	"github.com/focuscw0w/microservices/internal/user/security"
+	user "github.com/focuscw0w/microservices/internal/user/service"
 	"log"
 	"net/http"
 	"strconv"
-	"strings"
-
-	"github.com/focuscw0w/microservices/internal/user/security"
-	"github.com/focuscw0w/microservices/internal/user/service"
 )
 
 type Handler struct {
-	UserService *service.UserService
+	UserService  *user.Service
+	EmailService *email.Service
 }
 
-func NewHandler(userService *service.UserService) *Handler {
-	return &Handler{UserService: userService}
+func NewHandler(userService *user.Service, emailService *email.Service) *Handler {
+	return &Handler{UserService: userService, EmailService: emailService}
 }
 
 func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
@@ -28,7 +28,7 @@ func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req service.SignUpRequest
+	var req user.SignUpRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		log.Printf("Failed to decode request body: %v", err)
@@ -38,8 +38,8 @@ func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 
 	userDTO, err := h.UserService.SignUp(&req)
 	if err != nil {
-		log.Printf("Failed to create user: %v", err)
-		http.Error(w, fmt.Sprintf("Could not create user: %v", err), http.StatusInternalServerError)
+		log.Printf("Failed to sign up: %v", err)
+		http.Error(w, "Failed to sign up", http.StatusInternalServerError)
 		return
 	}
 
@@ -85,7 +85,7 @@ func (h *Handler) HandleSignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var req service.SignInRequest
+	var req user.SignInRequest
 	err := json.NewDecoder(r.Body).Decode(&req)
 	if err != nil {
 		log.Printf("Failed to decode request body: %v", err)
@@ -200,9 +200,9 @@ func (h *Handler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idStr := strings.TrimPrefix(r.URL.Path, "/users/")
-	id, err := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
+		log.Printf("Failed to parse id: %v", err)
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
@@ -239,9 +239,9 @@ func (h *Handler) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	idStr := strings.TrimPrefix(r.URL.Path, "/users/")
-	id, err := strconv.Atoi(idStr)
+	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
+		log.Printf("Failed to parse id: %v", err)
 		http.Error(w, "Invalid user ID", http.StatusBadRequest)
 		return
 	}
@@ -256,6 +256,53 @@ func (h *Handler) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write([]byte(`{"message":"User deleted"}`))
+	if err != nil {
+		log.Printf("Error writing response: %v", err)
+		return
+	}
+}
+
+func (h *Handler) HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPut {
+		log.Printf("Rejected non-PUT method: %s", r.Method)
+		http.Error(w, "Only PUT method is allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	id, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		log.Printf("Failed to parse id: %v", err)
+		http.Error(w, "Invalid user ID", http.StatusBadRequest)
+		return
+	}
+
+	var req user.UpdateUserRequest
+	err = json.NewDecoder(r.Body).Decode(&req)
+	if err != nil {
+		log.Printf("Failed to decode request body: %v", err)
+		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		return
+	}
+
+	userDTO, err := h.UserService.UpdateUser(id, req)
+	if err != nil {
+		log.Printf("Failed to update user: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	buffer := new(bytes.Buffer)
+	err = json.NewEncoder(buffer).Encode(userDTO)
+	if err != nil {
+		log.Printf("Failed to encode response: %v", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	_, err = w.Write(buffer.Bytes())
 	if err != nil {
 		log.Printf("Error writing response: %v", err)
 		return

@@ -6,13 +6,13 @@ import (
 	"github.com/focuscw0w/microservices/internal/user/security"
 )
 
-// UserService service dependency
-type UserService struct {
+// Service dependency
+type Service struct {
 	userRepo repository.UserRepository
 }
 
-func NewService(repo repository.UserRepository) *UserService {
-	return &UserService{userRepo: repo}
+func NewService(repo repository.UserRepository) *Service {
+	return &Service{userRepo: repo}
 }
 
 type SignUpRequest struct {
@@ -26,13 +26,17 @@ type SignInRequest struct {
 	Password string `json:"password"`
 }
 
+type UpdateUserRequest struct {
+	Username string `json:"username"`
+}
+
 type UserDTO struct {
 	ID       int    `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 }
 
-func (s *UserService) SignUp(req *SignUpRequest) (*UserDTO, error) {
+func (s *Service) SignUp(req *SignUpRequest) (*UserDTO, error) {
 	if req.Username == "" || req.Email == "" || req.Password == "" {
 		return nil, errors.ErrEmptyCredentials
 	}
@@ -62,7 +66,7 @@ func (s *UserService) SignUp(req *SignUpRequest) (*UserDTO, error) {
 	return userDTO, nil
 }
 
-func (s *UserService) SignIn(req *SignInRequest) (*UserDTO, error) {
+func (s *Service) SignIn(req *SignInRequest) (*UserDTO, error) {
 	if req.Username == "" || req.Password == "" {
 		return nil, errors.ErrEmptyCredentials
 	}
@@ -86,7 +90,7 @@ func (s *UserService) SignIn(req *SignInRequest) (*UserDTO, error) {
 	return userDTO, nil
 }
 
-func (s *UserService) GetUsers() ([]*UserDTO, error) {
+func (s *Service) GetUsers() ([]*UserDTO, error) {
 	users, err := s.userRepo.GetAllUsers()
 	if err != nil {
 		return nil, err
@@ -104,7 +108,7 @@ func (s *UserService) GetUsers() ([]*UserDTO, error) {
 	return usersDTO, nil
 }
 
-func (s *UserService) GetUser(id int) (*UserDTO, error) {
+func (s *Service) GetUser(id int) (*UserDTO, error) {
 	user, err := s.userRepo.GetUserByID(id)
 	if err != nil {
 		return nil, errors.ErrUserNotFound
@@ -119,11 +123,31 @@ func (s *UserService) GetUser(id int) (*UserDTO, error) {
 	return userDTO, nil
 }
 
-func (s *UserService) DeleteUser(id int) error {
+func (s *Service) DeleteUser(id int) error {
 	err := s.userRepo.DeleteUser(id)
 	if err != nil {
-		return errors.ErrUserNotFound
+		return errors.ErrDeleteUserFailed
 	}
 
 	return nil
+}
+
+func (s *Service) UpdateUser(id int, req UpdateUserRequest) (*UserDTO, error) {
+	user, err := s.userRepo.GetUserByID(id)
+	if err != nil {
+		return nil, errors.ErrUserNotFound
+	}
+
+	err = s.userRepo.UpdateUser(user.ID, req.Username)
+	if err != nil {
+		return nil, errors.ErrUpdateUserFailed
+	}
+
+	userDTO := &UserDTO{
+		ID:       user.ID,
+		Username: req.Username,
+		Email:    user.Email,
+	}
+
+	return userDTO, nil
 }

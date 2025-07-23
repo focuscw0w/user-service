@@ -7,7 +7,7 @@ type UserRepository interface {
 	GetUserByUsername(username string) (*User, error)
 	GetAllUsers() ([]*User, error)
 	CreateUser(user *User) (*User, error)
-	UpdateUser(user *User) error
+	UpdateUser(id int, username string) error
 	DeleteUser(id int) error
 }
 
@@ -94,7 +94,14 @@ func (s *SQLRepository) CreateUser(user *User) (*User, error) {
 	return user, nil
 }
 
-func (s *SQLRepository) UpdateUser(user *User) error {
+func (s *SQLRepository) UpdateUser(id int, username string) error {
+	query := `UPDATE users SET username = ? WHERE id = ?`
+
+	_, err := s.db.Exec(query, username, id)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
