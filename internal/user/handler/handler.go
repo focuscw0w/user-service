@@ -253,6 +253,16 @@ func (h *Handler) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	c := &http.Cookie{
+		Name:     "auth_token",
+		Value:    "",
+		HttpOnly: true,
+		Path:     "/",
+		MaxAge:   -1,
+	}
+
+	http.SetCookie(w, c)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	_, err = w.Write([]byte(`{"message":"User deleted"}`))
