@@ -1,8 +1,6 @@
 package handler
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	email "github.com/focuscw0w/microservices/internal/email/service"
 	"github.com/focuscw0w/microservices/internal/user/security"
@@ -21,18 +19,14 @@ func NewHandler(userService *user.Service, emailService *email.Service) *Handler
 	return &Handler{UserService: userService, EmailService: emailService}
 }
 
+// TODO: refactor handlers
 func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		log.Printf("Rejected non-POST method: %s", r.Method)
-		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+	if !validMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	var req user.SignUpRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		log.Printf("Failed to decode request body: %v", err)
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+	if !decodeBody(w, r, &req) {
 		return
 	}
 
@@ -59,37 +53,16 @@ func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &c)
-
-	buffer := new(bytes.Buffer)
-	err = json.NewEncoder(buffer).Encode(userDTO)
-	if err != nil {
-		log.Printf("Failed to encode response: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-
-	_, err = w.Write(buffer.Bytes())
-	if err != nil {
-		log.Printf("Error writing response: %v", err)
-		return
-	}
+	writeJSON(w, http.StatusCreated, userDTO)
 }
 
 func (h *Handler) HandleSignIn(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		log.Printf("Rejected non-POST method: %s", r.Method)
-		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+	if !validMethod(w, r, http.MethodPost) {
 		return
 	}
 
 	var req user.SignInRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		log.Printf("Failed to decode request body: %v", err)
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+	if !decodeBody(w, r, &req) {
 		return
 	}
 
@@ -117,28 +90,11 @@ func (h *Handler) HandleSignIn(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &c)
 
-	buffer := new(bytes.Buffer)
-	err = json.NewEncoder(buffer).Encode(userDTO)
-	if err != nil {
-		log.Printf("Failed to encode response: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	_, err = w.Write(buffer.Bytes())
-	if err != nil {
-		log.Printf("Error writing response: %v", err)
-		return
-	}
+	writeJSON(w, http.StatusOK, userDTO)
 }
 
 func (h *Handler) HandleSignOut(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		log.Printf("Rejected non-POST method: %s", r.Method)
-		http.Error(w, "Only POST method is allowed", http.StatusMethodNotAllowed)
+	if !validMethod(w, r, http.MethodPost) {
 		return
 	}
 
@@ -162,9 +118,7 @@ func (h *Handler) HandleSignOut(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		log.Printf("Rejected non-GET method: %s", r.Method)
-		http.Error(w, "Only GET method is allowed", http.StatusMethodNotAllowed)
+	if !validMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -175,28 +129,12 @@ func (h *Handler) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	buffer := new(bytes.Buffer)
-	err = json.NewEncoder(buffer).Encode(usersDTO)
-	if err != nil {
-		log.Printf("Failed to encode response: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	_, err = w.Write(buffer.Bytes())
-	if err != nil {
-		log.Printf("Error writing response: %v", err)
-		return
-	}
+	writeJSON(w, http.StatusOK, usersDTO)
 }
 
+// TODO: check permission
 func (h *Handler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodGet {
-		log.Printf("Rejected non-GET method: %s", r.Method)
-		http.Error(w, "Only GET method is allowed", http.StatusMethodNotAllowed)
+	if !validMethod(w, r, http.MethodGet) {
 		return
 	}
 
@@ -214,28 +152,12 @@ func (h *Handler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	buffer := new(bytes.Buffer)
-	err = json.NewEncoder(buffer).Encode(userDTO)
-	if err != nil {
-		log.Printf("Failed to encode response: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	_, err = w.Write(buffer.Bytes())
-	if err != nil {
-		log.Printf("Error writing response: %v", err)
-		return
-	}
+	writeJSON(w, http.StatusOK, userDTO)
 }
 
+// TODO: check permission
 func (h *Handler) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodDelete {
-		log.Printf("Rejected non-DELETE method: %s", r.Method)
-		http.Error(w, "Only DELETE method is allowed", http.StatusMethodNotAllowed)
+	if !validMethod(w, r, http.MethodDelete) {
 		return
 	}
 
@@ -273,9 +195,7 @@ func (h *Handler) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPut {
-		log.Printf("Rejected non-PUT method: %s", r.Method)
-		http.Error(w, "Only PUT method is allowed", http.StatusMethodNotAllowed)
+	if !validMethod(w, r, http.MethodPut) {
 		return
 	}
 
@@ -287,10 +207,7 @@ func (h *Handler) HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var req user.UpdateUserRequest
-	err = json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		log.Printf("Failed to decode request body: %v", err)
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+	if !decodeBody(w, r, &req) {
 		return
 	}
 
@@ -301,20 +218,5 @@ func (h *Handler) HandleUpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	buffer := new(bytes.Buffer)
-	err = json.NewEncoder(buffer).Encode(userDTO)
-	if err != nil {
-		log.Printf("Failed to encode response: %v", err)
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-		return
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-
-	_, err = w.Write(buffer.Bytes())
-	if err != nil {
-		log.Printf("Error writing response: %v", err)
-		return
-	}
+	writeJSON(w, http.StatusOK, userDTO)
 }

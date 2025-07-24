@@ -41,6 +41,11 @@ func (s *Service) SignUp(req *SignUpRequest) (*UserDTO, error) {
 		return nil, errors.ErrEmptyCredentials
 	}
 
+	_, err := s.userRepo.GetUserByUsername(req.Username)
+	if err == nil {
+		return nil, errors.ErrUserAlreadyExist
+	}
+
 	hashedPassword, err := security.HashPassword(req.Password)
 	if err != nil {
 		return nil, err
