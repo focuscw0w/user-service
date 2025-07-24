@@ -37,7 +37,7 @@ func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := security.CreateToken(userDTO.Username)
+	token, err := security.CreateToken(userDTO.ID)
 	if err != nil {
 		log.Printf("Failed to create session token: %v", err)
 		http.Error(w, "Internal server errors", http.StatusInternalServerError)
@@ -73,7 +73,7 @@ func (h *Handler) HandleSignIn(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	token, err := security.CreateToken(userDTO.Username)
+	token, err := security.CreateToken(userDTO.ID)
 	if err != nil {
 		log.Printf("Failed to create session token: %v", err)
 		http.Error(w, "Internal server errors", http.StatusInternalServerError)

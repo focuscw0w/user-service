@@ -38,10 +38,10 @@ func main() {
 	router.HandleFunc("POST /sign-in", app.handler.HandleSignIn)
 	router.HandleFunc("POST /sign-out", app.handler.HandleSignOut)
 
-	router.Handle("PUT /users/update/{id}", middleware.Authorize(http.HandlerFunc(app.handler.HandleUpdateUser)))
+	router.Handle("PUT /users/update/{id}", middleware.Authorize(middleware.CheckPermission(http.HandlerFunc(app.handler.HandleUpdateUser))))
 	router.HandleFunc("GET /users", app.handler.HandleGetUsers)
-	router.Handle("GET /users/{id}", middleware.Authorize(http.HandlerFunc(app.handler.HandleGetUser)))
-	router.Handle("DELETE /users/{id}", middleware.Authorize(http.HandlerFunc(app.handler.HandleDeleteUser)))
+	router.Handle("GET /users/{id}", middleware.Authorize(middleware.CheckPermission(http.HandlerFunc(app.handler.HandleGetUser))))
+	router.Handle("DELETE /users/{id}", middleware.Authorize(middleware.CheckPermission(http.HandlerFunc(app.handler.HandleDeleteUser))))
 
 	stack := middleware.CreateStack(
 		middleware.Logging,
