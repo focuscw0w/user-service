@@ -19,7 +19,6 @@ func NewHandler(userService *user.Service, emailService *email.Service) *Handler
 	return &Handler{UserService: userService, EmailService: emailService}
 }
 
-// TODO: refactor handlers
 func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	if !validMethod(w, r, http.MethodPost) {
 		return
@@ -132,7 +131,6 @@ func (h *Handler) HandleGetUsers(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, usersDTO)
 }
 
-// TODO: check permission
 func (h *Handler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 	if !validMethod(w, r, http.MethodGet) {
 		return
@@ -155,7 +153,6 @@ func (h *Handler) HandleGetUser(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, userDTO)
 }
 
-// TODO: check permission
 func (h *Handler) HandleDeleteUser(w http.ResponseWriter, r *http.Request) {
 	if !validMethod(w, r, http.MethodDelete) {
 		return

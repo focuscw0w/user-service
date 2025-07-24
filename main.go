@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"github.com/focuscw0w/microservices/internal/config"
+	"github.com/focuscw0w/microservices/internal/user/security"
 	"github.com/focuscw0w/microservices/middleware"
 	"log"
 	"net/http"
@@ -18,6 +21,13 @@ type application struct {
 }
 
 func main() {
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	security.InitJWT(cfg.SecretKey)
+
 	db, err := db.InitDB("app.db")
 	if err != nil {
 		log.Fatal(err)
@@ -47,8 +57,9 @@ func main() {
 		middleware.Logging,
 	)
 
+	addr := fmt.Sprintf(":%s", cfg.Port)
 	server := http.Server{
-		Addr:    ":8080",
+		Addr:    addr,
 		Handler: stack(router),
 	}
 
