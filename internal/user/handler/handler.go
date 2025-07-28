@@ -2,7 +2,6 @@ package handler
 
 import (
 	"fmt"
-	email "github.com/focuscw0w/microservices/internal/email/service"
 	"github.com/focuscw0w/microservices/internal/user/security"
 	user "github.com/focuscw0w/microservices/internal/user/service"
 	"log"
@@ -11,12 +10,11 @@ import (
 )
 
 type Handler struct {
-	UserService  *user.Service
-	EmailService *email.Service
+	UserService *user.Service
 }
 
-func NewHandler(userService *user.Service, emailService *email.Service) *Handler {
-	return &Handler{UserService: userService, EmailService: emailService}
+func NewHandler(userService *user.Service) *Handler {
+	return &Handler{UserService: userService}
 }
 
 func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
@@ -52,6 +50,7 @@ func (h *Handler) HandleSignUp(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.SetCookie(w, &c)
+
 	writeJSON(w, http.StatusCreated, userDTO)
 }
 
