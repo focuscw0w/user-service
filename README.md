@@ -1,4 +1,4 @@
-# User Microservice (REST API in Go)
+# User Microservice (API in Go)
 
 ## Overview
 This project is a **user management microservice** that exposes a **REST API** for authentication and user management.  
