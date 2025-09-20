@@ -1,9 +1,9 @@
-# User Microservice (API in Go)
+# User Service (API in Go)
 
 ## Overview
-This project is a **user management microservice** that exposes a **REST API** for authentication and user management.  
+This project is a **user management service** that exposes a **REST API** for authentication and user management.  
 It is written in Go, uses **SQLite** as the database, and implements **JWT-based authentication**.  
-The service is designed to be part of a microservices architecture.
+The service is designed to be part of a repository pattern architecture.
 
 ## Features
 ### Authentication
